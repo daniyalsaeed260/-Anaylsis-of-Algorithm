@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Closest Pair Quest</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Closest Pair Quest</h1>
+            <p>Find the closest enemies on the map!</p>
+        </header>
+
+        <main>
+            <div class="game-area">
+                <canvas id="gameCanvas" width="800" height="600"></canvas>
+            </div>
+
+            <div class="controls">
+                <div class="button-group">
+                    <button id="generateBtn" class="btn primary">Generate Points</button>
+                    <button id="bruteForceBtn" class="btn secondary" disabled>Run Brute Force</button>
+                    <button id="dncBtn" class="btn secondary" disabled>Run Divide & Conquer</button>
+                    <button id="showClosestBtn" class="btn accent" disabled>Show Closest Pair</button>
+                </div>
+
+                <div class="stats-panel">
+                    <div class="stat-card">
+                        <h3>Points</h3>
+                        <span id="pointCount">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Brute Force Time</h3>
+                        <span id="bfTime">-- ms</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>D&C Time</h3>
+                        <span id="dncTime">-- ms</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Closest Distance</h3>
+                        <span id="minDist">--</span>
+                    </div>
+                </div>
+
+                <div id="resultMessage" class="result-message"></div>
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Closest Pair Quest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #8b5cf6;
+            --accent-highlight: #10b981;
+            --danger: #ef4444;
+            --canvas-bg: #020617;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .game-area {
+            position: relative;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--card-bg);
+        }
+
+        canvas {
+            background-color: var(--canvas-bg);
+            display: block;
+            cursor: crosshair;
+        }
+
+        .controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn.primary {
+            background-color: var(--accent-primary);
+            color: white;
+        }
+
+        .btn.primary:hover:not(:disabled) {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn.secondary {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--text-secondary);
+        }
+
+        .btn.secondary:hover:not(:disabled) {
+            background-color: #334155;
+            border-color: var(--text-primary);
+        }
+
+        .btn.accent {
+            background-color: var(--accent-highlight);
+            color: white;
+        }
+
+        .btn.accent:hover:not(:disabled) {
+            background-color: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-card h3 {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .stat-card span {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .result-message {
+            text-align: center;
+            font-size: 1.1rem;
+            min-height: 1.5em;
+            color: var(--accent-secondary);
+        }
+
+        .speedup {
+            background: linear-gradient(135deg, var(--accent-highlight), #059669);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Closest Pair Quest</h1>
+            <p>Find the closest enemies on the map!</p>
+        </header>
+
+        <main>
+            <div class="game-area">
+                <canvas id="gameCanvas" width="800" height="600"></canvas>
+            </div>
+
+            <div class="controls">
+                <div class="button-group">
+                    <button id="generateBtn" class="btn primary">Generate Points</button>
+                    <button id="runAlgorithmsBtn" class="btn accent" disabled>Run Algorithms</button>
+                </div>
+
+                <div class="stats-panel">
+                    <div class="stat-card">
+                        <h3>Points</h3>
+                        <span id="pointCount">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Brute Force Time</h3>
+                        <span id="bfTime">-- ms</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>D&C Time</h3>
+                        <span id="dncTime">-- ms</span>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Closest Distance</h3>
+                        <span id="minDist">--</span>
+                    </div>
+                </div>
+
+                <div id="speedup" class="speedup" style="display: none;"></div>
+                <div id="resultMessage" class="result-message"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const generateBtn = document.getElementById('generateBtn');
+        const runAlgorithmsBtn = document.getElementById('runAlgorithmsBtn');
+        const pointCountSpan = document.getElementById('pointCount');
+        const bfTimeSpan = document.getElementById('bfTime');
+        const dncTimeSpan = document.getElementById('dncTime');
+        const minDistSpan = document.getElementById('minDist');
+        const resultMessage = document.getElementById('resultMessage');
+        const speedupDiv = document.getElementById('speedup');
+
+        let points = [];
+        const POINT_RADIUS = 4;
+        const POINT_COLOR = '#3b82f6';
+        const HIGHLIGHT_COLOR = '#ef4444';
+        const LINE_COLOR = '#10b981';
+
+        // Utility Functions
+        function distance(p1, p2) {
+            return Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawPoint(x, y, color = POINT_COLOR, radius = POINT_RADIUS) {
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawLine(p1, p2, color = LINE_COLOR) {
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        function drawPoints() {
+            clearCanvas();
+            points.forEach(p => drawPoint(p.x, p.y));
+        }
+
+        // Generate Random Points
+        function generateRandomPoints(n) {
+            points = [];
+            for (let i = 0; i < n; i++) {
+                points.push({
+                    x: 20 + Math.random() * 760,
+                    y: 20 + Math.random() * 560
+                });
+            }
+            drawPoints();
+            pointCountSpan.textContent = points.length;
+            runAlgorithmsBtn.disabled = false;
+            bfTimeSpan.textContent = '-- ms';
+            dncTimeSpan.textContent = '-- ms';
+            minDistSpan.textContent = '--';
+            resultMessage.textContent = '';
+            speedupDiv.style.display = 'none';
+        }
+
+        // BRUTE FORCE ALGORITHM - O(n²)
+        function bruteForceClosestPair(pts) {
+            let minDist = Infinity;
+            let closestPair = null;
+
+            for (let i = 0; i < pts.length; i++) {
+                for (let j = i + 1; j < pts.length; j++) {
+                    const d = distance(pts[i], pts[j]);
+                    if (d < minDist) {
+                        minDist = d;
+                        closestPair = { p1: pts[i], p2: pts[j] };
+                    }
+                }
+            }
+
+            return { pair: closestPair, distance: minDist };
+        }
+
+        // DIVIDE & CONQUER ALGORITHM - O(n log n)
+        function stripClosest(strip, d) {
+            let minDist = d;
+            let closestPair = null;
+
+            strip.sort((a, b) => a.y - b.y);
+
+            for (let i = 0; i < strip.length; i++) {
+                for (let j = i + 1; j < strip.length && (strip[j].y - strip[i].y) < minDist; j++) {
+                    const dist = distance(strip[i], strip[j]);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closestPair = { p1: strip[i], p2: strip[j] };
+                    }
+                }
+            }
+
+            return { pair: closestPair, distance: minDist };
+        }
+
+        function closestUtil(pointsSortedX) {
+            const n = pointsSortedX.length;
+
+            if (n <= 3) {
+                return bruteForceClosestPair(pointsSortedX);
+            }
+
+            const mid = Math.floor(n / 2);
+            const midPoint = pointsSortedX[mid];
+
+            const left = pointsSortedX.slice(0, mid);
+            const right = pointsSortedX.slice(mid);
+
+            const leftResult = closestUtil(left);
+            const rightResult = closestUtil(right);
+
+            let minResult = leftResult.distance < rightResult.distance ? leftResult : rightResult;
+
+            const strip = [];
+            for (const point of pointsSortedX) {
+                if (Math.abs(point.x - midPoint.x) < minResult.distance) {
+                    strip.push(point);
+                }
+            }
+
+            const stripResult = stripClosest(strip, minResult.distance);
+
+            if (stripResult.pair && stripResult.distance < minResult.distance) {
+                return stripResult;
+            }
+
+            return minResult;
+        }
+
+        function divideAndConquerClosestPair(pts) {
+            const sortedPoints = [...pts].sort((a, b) => a.x - b.x);
+            return closestUtil(sortedPoints);
+        }
+
+        // Event Handlers
+        generateBtn.addEventListener('click', () => {
+            generateRandomPoints(50);
+            resultMessage.textContent = 'Points generated! Click "Run Algorithms" to find the closest pair.';
+        });
+
+        runAlgorithmsBtn.addEventListener('click', () => {
+            resultMessage.textContent = 'Running algorithms...';
+
+            // Brute Force
+            const bfStart = performance.now();
+            const bfResult = bruteForceClosestPair(points);
+            const bfEnd = performance.now();
+            const bfTime = bfEnd - bfStart;
+
+            // Divide and Conquer
+            const dncStart = performance.now();
+            const dncResult = divideAndConquerClosestPair(points);
+            const dncEnd = performance.now();
+            const dncTime = dncEnd - dncStart;
+
+            // Display results
+            bfTimeSpan.textContent = `${bfTime.toFixed(4)} ms`;
+            dncTimeSpan.textContent = `${dncTime.toFixed(4)} ms`;
+            minDistSpan.textContent = dncResult.distance.toFixed(2);
+
+            // Calculate speedup
+            const speedup = bfTime / dncTime;
+            speedupDiv.textContent = `⚡ Divide & Conquer is ${speedup.toFixed(2)}x faster!`;
+            speedupDiv.style.display = 'block';
+
+            // Visualize
+            drawPoints();
+            if (dncResult.pair) {
+                drawLine(dncResult.pair.p1, dncResult.pair.p2);
+                drawPoint(dncResult.pair.p1.x, dncResult.pair.p1.y, HIGHLIGHT_COLOR, 6);
+                drawPoint(dncResult.pair.p2.x, dncResult.pair.p2.y, HIGHLIGHT_COLOR, 6);
+            }
+
+            resultMessage.textContent = `Closest pair found! Distance: ${dncResult.distance.toFixed(2)} pixels`;
+        });
+
+        // Auto-generate on load
+        window.addEventListener('load', () => {
+            generateRandomPoints(50);
+            resultMessage.textContent = 'Welcome! Click "Run Algorithms" to start.';
+        });
+    </script>
+</body>
+
+</html>
